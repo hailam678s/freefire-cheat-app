@@ -1,1 +1,111 @@
+# ============================================
+# FILE: .github/workflows/build.yml
+# ============================================
+# BUILD IPA FREE FIRE CHEAT BẰNG CLANG
 
+name: Build FreeFire Cheat IPA
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Lay ma nguon
+        uses: actions/checkout@v5
+
+      - name: Build IPA bang clang
+        run: |
+          echo "=== KIEM TRA FILE ==="
+          ls -la
+          
+          echo "=== TAO THU MUC APP ==="
+          mkdir -p build/Payload/FreeFireCheatApp.app
+          
+          echo "=== TIM SDK iOS ==="
+          SDK_PATH=$(find /Applications -name "iPhoneOS.sdk" -type d 2>/dev/null | head -1)
+          echo "SDK PATH: $SDK_PATH"
+          
+          echo "=== BUILD BINARY BANG CLANG ==="
+          clang \
+            -arch arm64 \
+            -isysroot "$SDK_PATH" \
+            -mios-version-min=12.0 \
+            -fobjc-arc \
+            -Wno-deprecated-declarations \
+            -framework UIKit \
+            -framework Foundation \
+            -framework CoreGraphics \
+            -framework QuartzCore \
+            -o build/Payload/FreeFireCheatApp.app/FreeFireCheatApp \
+            FreeFireCheatApp.m
+          
+          echo "=== KIEM TRA BINARY ==="
+          ls -la build/Payload/FreeFireCheatApp.app/
+          
+          echo "=== TAO INFO.PLIST ==="
+          cat > build/Payload/FreeFireCheatApp.app/Info.plist << 'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>CFBundleDevelopmentRegion</key>
+              <string>en</string>
+              <key>CFBundleExecutable</key>
+              <string>FreeFireCheatApp</string>
+              <key>CFBundleIdentifier</key>
+              <string>com.hailam.freefirecheat</string>
+              <key>CFBundleInfoDictionaryVersion</key>
+              <string>6.0</string>
+              <key>CFBundleName</key>
+              <string>FreeFireCheatApp</string>
+              <key>CFBundleDisplayName</key>
+              <string>FF Cheat</string>
+              <key>CFBundlePackageType</key>
+              <string>APPL</string>
+              <key>CFBundleShortVersionString</key>
+              <string>1.0</string>
+              <key>CFBundleVersion</key>
+              <string>1</string>
+              <key>LSRequiresIPhoneOS</key>
+              <true/>
+              <key>UILaunchStoryboardName</key>
+              <string>LaunchScreen</string>
+              <key>UISupportedInterfaceOrientations</key>
+              <array>
+                  <string>UIInterfaceOrientationPortrait</string>
+              </array>
+              <key>NSAppTransportSecurity</key>
+              <dict>
+                  <key>NSAllowsArbitraryLoads</key>
+                  <true/>
+              </dict>
+              <key>LSApplicationQueriesSchemes</key>
+              <array>
+                  <string>freefire</string>
+                  <string>freefiremax</string>
+              </array>
+          </dict>
+          </plist>
+          EOF
+          
+          echo "=== DONG GOI IPA ==="
+          cd build
+          zip -r ../FreeFireCheatApp.ipa Payload/
+          cd ..
+          
+          echo "=== KET QUA ==="
+          ls -la FreeFireCheatApp.ipa
+
+      - name: Tai file IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: FreeFireCheatApp-IPA
+          path: |
+            **/*.ipa
+          if-no-files-found: error
