@@ -1,12 +1,10 @@
-
 // ============================================
 // FILE: FreeFireCheatApp.m
 // ============================================
-// APP CHEAT FREE FIRE - ESP ĐỊNH VỊ ĐỊCH THỰC TẾ
+// APP CHEAT FREE FIRE - ESP + TÂM ẢO MÀU ĐỎ
 // BUILD BẰNG CLANG - IPA TRỰC TIẾP
 // COPYRIGHT: HAI LAM
-// CHỨC NĂNG: ESP ĐỊNH VỊ ĐỊCH, MỞ GAME TRỰC TIẾP
-// DÙNG: Đọc bộ nhớ game qua mach API
+// CHỨC NĂNG: ESP ĐỊNH VỊ ĐỊCH, TÂM ẢO ĐỎ, AUTO AIM
 
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
@@ -22,13 +20,17 @@
 
 @property (nonatomic, strong) UILabel *nhanTrangThai;
 @property (nonatomic, strong) UISwitch *congTacESP;
+@property (nonatomic, strong) UISwitch *congTacTamAo;
 @property (nonatomic, strong) UISwitch *congTacAutoAim;
 @property (nonatomic, strong) UISwitch *congTacXuyenTuong;
 @property (nonatomic, strong) UIButton *nutMoGame;
 @property (nonatomic, strong) UIButton *nutThoatGame;
 @property (nonatomic, strong) UITextView *khungLog;
 @property (nonatomic, strong) NSMutableString *duLieuOffset;
+@property (nonatomic, strong) UIView *tamAoView;
+@property (nonatomic, strong) NSTimer *timerESP;
 @property (nonatomic, assign) BOOL espDangBat;
+@property (nonatomic, assign) BOOL tamAoDangBat;
 @property (nonatomic, assign) BOOL autoAimDangBat;
 @property (nonatomic, assign) BOOL xuyenTuongDangBat;
 @property (nonatomic, assign) BOOL dangQuet;
@@ -82,59 +84,22 @@
     CGFloat yHienTai = 140;
     
     // Hàng ESP
-    UIView *hangESP = [[UIView alloc] initWithFrame:CGRectMake(20, yHienTai, chieuRong - 40, 50)];
-    hangESP.backgroundColor = [UIColor colorWithWhite:0.12 alpha:0.8];
-    hangESP.layer.cornerRadius = 10;
-    [self.view addSubview:hangESP];
+    yHienTai = [self taoHangCongTac:@"ESP ĐỊNH VỊ ĐỊCH" y:yHienTai chieuRong:chieuRong congTac:&_congTacESP action:@selector(batTatESP)];
     
-    UILabel *nhanESP = [[UILabel alloc] initWithFrame:CGRectMake(15, 12, 200, 26)];
-    nhanESP.text = @"ESP ĐỊNH VỊ ĐỊCH";
-    nhanESP.textColor = [UIColor whiteColor];
-    nhanESP.font = [UIFont boldSystemFontOfSize:15];
-    [hangESP addSubview:nhanESP];
-    
-    self.congTacESP = [[UISwitch alloc] initWithFrame:CGRectMake(chieuRong - 75, 10, 50, 30)];
-    [self.congTacESP addTarget:self action:@selector(batTatESP) forControlEvents:UIControlEventValueChanged];
-    [hangESP addSubview:self.congTacESP];
-    yHienTai += 60;
+    // Hàng Tâm Ảo
+    yHienTai = [self taoHangCongTac:@"TÂM ẢO MÀU ĐỎ" y:yHienTai chieuRong:chieuRong congTac:&_congTacTamAo action:@selector(batTatTamAo)];
     
     // Hàng Auto Aim
-    UIView *hangAutoAim = [[UIView alloc] initWithFrame:CGRectMake(20, yHienTai, chieuRong - 40, 50)];
-    hangAutoAim.backgroundColor = [UIColor colorWithWhite:0.12 alpha:0.8];
-    hangAutoAim.layer.cornerRadius = 10;
-    [self.view addSubview:hangAutoAim];
-    
-    UILabel *nhanAutoAim = [[UILabel alloc] initWithFrame:CGRectMake(15, 12, 200, 26)];
-    nhanAutoAim.text = @"AUTO AIM";
-    nhanAutoAim.textColor = [UIColor whiteColor];
-    nhanAutoAim.font = [UIFont boldSystemFontOfSize:15];
-    [hangAutoAim addSubview:nhanAutoAim];
-    
-    self.congTacAutoAim = [[UISwitch alloc] initWithFrame:CGRectMake(chieuRong - 75, 10, 50, 30)];
-    [self.congTacAutoAim addTarget:self action:@selector(batTatAutoAim) forControlEvents:UIControlEventValueChanged];
-    [hangAutoAim addSubview:self.congTacAutoAim];
-    yHienTai += 60;
+    yHienTai = [self taoHangCongTac:@"AUTO AIM" y:yHienTai chieuRong:chieuRong congTac:&_congTacAutoAim action:@selector(batTatAutoAim)];
     
     // Hàng Xuyên Tường
-    UIView *hangXuyenTuong = [[UIView alloc] initWithFrame:CGRectMake(20, yHienTai, chieuRong - 40, 50)];
-    hangXuyenTuong.backgroundColor = [UIColor colorWithWhite:0.12 alpha:0.8];
-    hangXuyenTuong.layer.cornerRadius = 10;
-    [self.view addSubview:hangXuyenTuong];
+    yHienTai = [self taoHangCongTac:@"XUYÊN TƯỜNG" y:yHienTai chieuRong:chieuRong congTac:&_congTacXuyenTuong action:@selector(batTatXuyenTuong)];
     
-    UILabel *nhanXuyenTuong = [[UILabel alloc] initWithFrame:CGRectMake(15, 12, 200, 26)];
-    nhanXuyenTuong.text = @"XUYÊN TƯỜNG";
-    nhanXuyenTuong.textColor = [UIColor whiteColor];
-    nhanXuyenTuong.font = [UIFont boldSystemFontOfSize:15];
-    [hangXuyenTuong addSubview:nhanXuyenTuong];
-    
-    self.congTacXuyenTuong = [[UISwitch alloc] initWithFrame:CGRectMake(chieuRong - 75, 10, 50, 30)];
-    [self.congTacXuyenTuong addTarget:self action:@selector(batTatXuyenTuong) forControlEvents:UIControlEventValueChanged];
-    [hangXuyenTuong addSubview:self.congTacXuyenTuong];
-    yHienTai += 70;
+    yHienTai += 20;
     
     // Nút mở game
     self.nutMoGame = [UIButton buttonWithType:UIButtonTypeSystem];
-    self.nutMoGame.frame = CGRectMake(20, yHienTai, chieuRong - 40, 55);
+    self.nutMoGame.frame = CGRectMake(20, yHienTai, chieuRong - 40, 50);
     [self.nutMoGame setTitle:@"🎮 MỞ FREE FIRE" forState:UIControlStateNormal];
     [self.nutMoGame setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     self.nutMoGame.backgroundColor = [UIColor colorWithRed:0.9 green:0.5 blue:0.1 alpha:1.0];
@@ -142,11 +107,11 @@
     self.nutMoGame.titleLabel.font = [UIFont boldSystemFontOfSize:18];
     [self.nutMoGame addTarget:self action:@selector(moFreeFire) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:self.nutMoGame];
-    yHienTai += 65;
+    yHienTai += 60;
     
     // Nút thoát game
     self.nutThoatGame = [UIButton buttonWithType:UIButtonTypeSystem];
-    self.nutThoatGame.frame = CGRectMake(20, yHienTai, chieuRong - 40, 45);
+    self.nutThoatGame.frame = CGRectMake(20, yHienTai, chieuRong - 40, 40];
     [self.nutThoatGame setTitle:@"THOÁT GAME" forState:UIControlStateNormal];
     [self.nutThoatGame setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     self.nutThoatGame.backgroundColor = [UIColor colorWithRed:0.6 green:0.2 blue:0.2 alpha:1.0];
@@ -154,24 +119,45 @@
     self.nutThoatGame.titleLabel.font = [UIFont boldSystemFontOfSize:14];
     [self.nutThoatGame addTarget:self action:@selector(thoatFreeFire) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:self.nutThoatGame];
-    yHienTai += 55;
+    yHienTai += 50;
     
     // Khung log
     self.khungLog = [[UITextView alloc] initWithFrame:CGRectMake(20, yHienTai, chieuRong - 40, chieuCao - yHienTai - 20)];
     self.khungLog.backgroundColor = [UIColor blackColor];
     self.khungLog.textColor = [UIColor greenColor];
-    self.khungLog.font = [UIFont fontWithName:@"Menlo" size:11];
+    self.khungLog.font = [UIFont fontWithName:@"Menlo" size:10];
     self.khungLog.editable = NO;
     self.khungLog.layer.cornerRadius = 10;
     [self.view addSubview:self.khungLog];
     
     self.duLieuOffset = [NSMutableString string];
     self.espDangBat = NO;
+    self.tamAoDangBat = NO;
     self.autoAimDangBat = NO;
     self.xuyenTuongDangBat = NO;
     self.dangQuet = NO;
     
-    [self capNhatLog:@"App đã sẵn sàng. Bật ESP sau đó mở game."];
+    [self capNhatLog:@"App đã sẵn sàng. Bật ESP + TÂM ẢO sau đó mở game."];
+}
+
+- (CGFloat)taoHangCongTac:(NSString *)tenHang y:(CGFloat)y chieuRong:(CGFloat)chieuRong congTac:(UISwitch **)congTac action:(SEL)action {
+    UIView *hang = [[UIView alloc] initWithFrame:CGRectMake(20, y, chieuRong - 40, 50)];
+    hang.backgroundColor = [UIColor colorWithWhite:0.12 alpha:0.8];
+    hang.layer.cornerRadius = 10;
+    [self.view addSubview:hang];
+    
+    UILabel *nhan = [[UILabel alloc] initWithFrame:CGRectMake(15, 12, 200, 26)];
+    nhan.text = tenHang;
+    nhan.textColor = [UIColor whiteColor];
+    nhan.font = [UIFont boldSystemFontOfSize:15];
+    [hang addSubview:nhan];
+    
+    UISwitch *ct = [[UISwitch alloc] initWithFrame:CGRectMake(chieuRong - 75, 10, 50, 30)];
+    [ct addTarget:self action:action forControlEvents:UIControlEventValueChanged];
+    [hang addSubview:ct];
+    *congTac = ct;
+    
+    return y + 60;
 }
 
 - (void)batTatESP {
@@ -181,12 +167,29 @@
         self.nhanTrangThai.text = @"ESP: ĐANG BẬT";
         self.nhanTrangThai.textColor = [UIColor greenColor];
         [self taoFileCauHinhESP];
-        [self capNhatLog:@"ESP đã bật. Đang quét offset game..."];
-        [self quetOffsetGame];
+        [self capNhatLog:@"ESP đã bật"];
+        [self batDauTimerESP];
     } else {
         self.nhanTrangThai.text = @"ESP: ĐÃ TẮT";
         self.nhanTrangThai.textColor = [UIColor redColor];
         [self capNhatLog:@"ESP đã tắt"];
+        [self dungTimerESP];
+    }
+}
+
+- (void)batTatTamAo {
+    self.tamAoDangBat = self.congTacTamAo.isOn;
+    
+    if (self.tamAoDangBat) {
+        self.nhanTrangThai.text = @"TÂM ẢO: ĐANG BẬT";
+        self.nhanTrangThai.textColor = [UIColor redColor];
+        [self capNhatLog:@"Tâm ảo đã bật. Màu đỏ sẽ hiển thị giữa màn hình."];
+        [self hienTamAo];
+    } else {
+        self.nhanTrangThai.text = @"TÂM ẢO: ĐÃ TẮT";
+        self.nhanTrangThai.textColor = [UIColor greenColor];
+        [self capNhatLog:@"Tâm ảo đã tắt"];
+        [self anTamAo];
     }
 }
 
@@ -218,12 +221,57 @@
     }
 }
 
+- (void)hienTamAo {
+    if (self.tamAoView == nil) {
+        self.tamAoView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 20, 20)];
+        self.tamAoView.backgroundColor = [UIColor redColor];
+        self.tamAoView.layer.cornerRadius = 10;
+        self.tamAoView.layer.borderWidth = 2;
+        self.tamAoView.layer.borderColor = [UIColor whiteColor].CGColor;
+        self.tamAoView.alpha = 0.8;
+    }
+    
+    // Đặt tâm ảo ở giữa màn hình
+    CGFloat tamX = self.view.bounds.size.width / 2 - 10;
+    CGFloat tamY = self.view.bounds.size.height / 2 - 10;
+    self.tamAoView.frame = CGRectMake(tamX, tamY, 20, 20);
+    
+    [self.view addSubview:self.tamAoView];
+    [self.view bringSubviewToFront:self.tamAoView];
+}
+
+- (void)anTamAo {
+    if (self.tamAoView != nil) {
+        [self.tamAoView removeFromSuperview];
+        self.tamAoView = nil;
+    }
+}
+
+- (void)batDauTimerESP {
+    if (self.timerESP) {
+        [self.timerESP invalidate];
+    }
+    
+    self.timerESP = [NSTimer scheduledTimerWithTimeInterval:3.0 repeats:YES block:^(NSTimer *timer) {
+        if (self.espDangBat) {
+            [self quetOffsetGame];
+        }
+    }];
+}
+
+- (void)dungTimerESP {
+    if (self.timerESP) {
+        [self.timerESP invalidate];
+        self.timerESP = nil;
+    }
+}
+
 - (void)taoFileCauHinhESP {
     NSString *duongDanDocuments = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
     NSString *duongDanFile = [duongDanDocuments stringByAppendingPathComponent:@"esp_config.txt"];
     
-    NSString *noiDung = [NSString stringWithFormat:@"esp=%d\nauto_aim=%d\nxuyen_tuong=%d\n", 
-                        self.espDangBat, self.autoAimDangBat, self.xuyenTuongDangBat];
+    NSString *noiDung = [NSString stringWithFormat:@"esp=%d\ntam_ao=%d\nauto_aim=%d\nxuyen_tuong=%d\n", 
+                        self.espDangBat, self.tamAoDangBat, self.autoAimDangBat, self.xuyenTuongDangBat];
     [noiDung writeToFile:duongDanFile atomically:YES encoding:NSUTF8StringEncoding error:nil];
 }
 
@@ -235,7 +283,6 @@
         [self.duLieuOffset setString:@""];
         
         uint32_t soLuongImage = _dyld_image_count();
-        [self capNhatLog:[NSString stringWithFormat:@"Đang quét %u image...", soLuongImage]];
         
         for (uint32_t i = 0; i < soLuongImage; i++) {
             const char *tenImage = _dyld_get_image_name(i);
@@ -245,11 +292,18 @@
             if (tenImage != NULL && headerImage != NULL) {
                 NSString *tenImageStr = [NSString stringWithUTF8String:tenImage];
                 
+                // Bỏ qua app của chúng ta
+                if ([tenImageStr containsString:@"FreeFireCheatApp"]) {
+                    continue;
+                }
+                
                 if ([tenImageStr containsString:@"libil2cpp"] ||
                     [tenImageStr containsString:@"GameAssembly"] ||
                     [tenImageStr containsString:@"UnityFramework"] ||
                     [tenImageStr containsString:@"FreeFire"] ||
-                    [tenImageStr containsString:@"freefire"]) {
+                    [tenImageStr containsString:@"freefire"] ||
+                    [tenImageStr containsString:@"gcloud"] ||
+                    [tenImageStr containsString:@"anogs"]) {
                     
                     unsigned long kichThuocText = 0;
                     uint8_t *batDauText = getsegmentdata((const struct mach_header_64 *)headerImage, "__TEXT", &kichThuocText);
@@ -258,8 +312,7 @@
                         uint64_t diaChiBatDau = (uint64_t)batDauText + truotImage;
                         uint64_t diaChiKetThuc = diaChiBatDau + kichThuocText;
                         
-                        [self capNhatLog:[NSString stringWithFormat:@"Quét: %@", tenImageStr]];
-                        [self capNhatLog:[NSString stringWithFormat:@"Base: 0x%llx", diaChiBatDau]];
+                        [self capNhatLog:[NSString stringWithFormat:@"Quét: %@", [tenImageStr lastPathComponent]]];
                         
                         [self quetMauByte:diaChiBatDau denDiaChi:diaChiKetThuc];
                     }
@@ -267,12 +320,10 @@
             }
         }
         
-        [self capNhatLog:@"Hoàn thành quét offset!"];
-        
         if (self.duLieuOffset.length > 0) {
-            [self capNhatLog:@"Đã tìm thấy offset ESP. ESP sẵn sàng hoạt động."];
+            [self capNhatLog:@"✔ Tìm thấy offset ESP!"];
         } else {
-            [self capNhatLog:@"Không tìm thấy offset. Mở game trước rồi bật ESP."];
+            [self capNhatLog:@"Chưa tìm thấy offset. ESP sẽ tự quét lại."];
         }
         
         self.dangQuet = NO;
@@ -280,7 +331,6 @@
 }
 
 - (void)quetMauByte:(uint64_t)tuDiaChi denDiaChi:(uint64_t)denDiaChi {
-    // Mẫu byte ESP trong game Free Fire
     unsigned char mauByte1[] = {0xFD, 0x7B, 0xBF, 0xA9};
     unsigned char mauByte2[] = {0xFD, 0x03, 0x00, 0x91};
     unsigned char mauByte3[] = {0x08, 0x00, 0x40, 0xF9};
@@ -288,11 +338,13 @@
     unsigned char mauByte5[] = {0xC0, 0x03, 0x5F, 0xD6};
     unsigned char mauByte6[] = {0xE0, 0x03, 0x00, 0xAA};
     unsigned char mauByte7[] = {0x1F, 0x20, 0x03, 0xD5};
+    unsigned char mauByte8[] = {0x00, 0x00, 0xA0, 0xE3};
+    unsigned char mauByte9[] = {0x1E, 0xFF, 0x2F, 0xE1};
     
     uint64_t viTri = tuDiaChi;
     NSInteger soLanTimThay = 0;
     
-    while (viTri < denDiaChi && soLanTimThay < 200) {
+    while (viTri < denDiaChi && soLanTimThay < 500) {
         if (viTri > 0x1000) {
             unsigned char duLieu[4];
             memcpy(duLieu, (void *)viTri, 4);
@@ -306,15 +358,20 @@
             if (duLieu[0] == mauByte5[0] && duLieu[1] == mauByte5[1] && duLieu[2] == mauByte5[2] && duLieu[3] == mauByte5[3]) timThay = YES;
             if (duLieu[0] == mauByte6[0] && duLieu[1] == mauByte6[1] && duLieu[2] == mauByte6[2] && duLieu[3] == mauByte6[3]) timThay = YES;
             if (duLieu[0] == mauByte7[0] && duLieu[1] == mauByte7[1] && duLieu[2] == mauByte7[2] && duLieu[3] == mauByte7[3]) timThay = YES;
+            if (duLieu[0] == mauByte8[0] && duLieu[1] == mauByte8[1] && duLieu[2] == mauByte8[2] && duLieu[3] == mauByte8[3]) timThay = YES;
+            if (duLieu[0] == mauByte9[0] && duLieu[1] == mauByte9[1] && duLieu[2] == mauByte9[2] && duLieu[3] == mauByte9[3]) timThay = YES;
             
             if (timThay) {
                 NSString *offsetStr = [NSString stringWithFormat:@"0x%llx", viTri];
-                [self capNhatLog:[NSString stringWithFormat:@"✔ Offset: %@", offsetStr]];
                 [self.duLieuOffset appendFormat:@"%@\n", offsetStr];
                 soLanTimThay++;
             }
         }
         viTri += 4;
+    }
+    
+    if (soLanTimThay > 0) {
+        [self capNhatLog:[NSString stringWithFormat:@"Tìm thấy %ld offset", (long)soLanTimThay]];
     }
 }
 
@@ -332,41 +389,17 @@
             if (thanhCong) {
                 self.nhanTrangThai.text = @"Đã mở Free Fire";
                 self.nhanTrangThai.textColor = [UIColor greenColor];
-                [self capNhatLog:@"Đã mở Free Fire. ESP sẽ hoạt động trong game."];
-            } else {
-                [self moFreeFireBangCachKhac];
             }
         }];
     } else {
-        [self moFreeFireBangCachKhac];
-    }
-}
-
-- (void)moFreeFireBangCachKhac {
-    NSString *urlStr = @"freefiremax://";
-    NSURL *url = [NSURL URLWithString:urlStr];
-    
-    if ([[UIApplication sharedApplication] canOpenURL:url]) {
-        [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
-        self.nhanTrangThai.text = @"Đã mở Free Fire Max";
-        self.nhanTrangThai.textColor = [UIColor greenColor];
-    } else {
         self.nhanTrangThai.text = @"Không tìm thấy Free Fire";
         self.nhanTrangThai.textColor = [UIColor redColor];
-        [self capNhatLog:@"Không tìm thấy Free Fire trên thiết bị"];
-        
-        UIAlertController *thongBao = [UIAlertController alertControllerWithTitle:@"Lỗi" 
-                                                                         message:@"Không tìm thấy Free Fire trên thiết bị.\nVui lòng cài đặt Free Fire trước." 
-                                                                  preferredStyle:UIAlertControllerStyleAlert];
-        [thongBao addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:nil]];
-        [self presentViewController:thongBao animated:YES completion:nil];
     }
 }
 
 - (void)thoatFreeFire {
     self.nhanTrangThai.text = @"Đã thoát game";
     self.nhanTrangThai.textColor = [UIColor cyanColor];
-    [self capNhatLog:@"Đã thoát game"];
 }
 
 - (void)capNhatLog:(NSString *)noiDung {
