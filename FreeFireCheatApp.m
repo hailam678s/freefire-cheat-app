@@ -1,10 +1,11 @@
 // ============================================
 // FILE: FreeFireCheatApp.m
 // ============================================
-// APP CHEAT FREE FIRE - ESP + TÂM ẢO MÀU ĐỎ
+// APP CHEAT FREE FIRE - ESP + TÂM ẢO MÀU ĐỎ + ICON
 // BUILD BẰNG CLANG - IPA TRỰC TIẾP
 // COPYRIGHT: HAI LAM
 // CHỨC NĂNG: ESP ĐỊNH VỊ ĐỊCH, TÂM ẢO ĐỎ, AUTO AIM
+// ICON: Tạo icon bằng code khi khởi động
 
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
@@ -56,7 +57,22 @@
     CGFloat chieuRong = self.view.bounds.size.width;
     CGFloat chieuCao = self.view.bounds.size.height;
     
-    UILabel *tieuDe = [[UILabel alloc] initWithFrame:CGRectMake(20, 50, chieuRong - 40, 35)];
+    // Logo app
+    UIView *logoView = [[UIView alloc] initWithFrame:CGRectMake(chieuRong/2 - 30, 35, 60, 60)];
+    logoView.backgroundColor = [UIColor colorWithRed:0.9 green:0.3 blue:0.1 alpha:1.0];
+    logoView.layer.cornerRadius = 15;
+    logoView.layer.borderWidth = 3;
+    logoView.layer.borderColor = [UIColor whiteColor].CGColor;
+    [self.view addSubview:logoView];
+    
+    UILabel *logoText = [[UILabel alloc] initWithFrame:CGRectMake(0, 15, 60, 30)];
+    logoText.text = @"FF";
+    logoText.textAlignment = NSTextAlignmentCenter;
+    logoText.font = [UIFont boldSystemFontOfSize:28];
+    logoText.textColor = [UIColor whiteColor];
+    [logoView addSubview:logoText];
+    
+    UILabel *tieuDe = [[UILabel alloc] initWithFrame:CGRectMake(20, 105, chieuRong - 40, 35)];
     tieuDe.text = @"© HAI LAM - FF CHEAT";
     tieuDe.textAlignment = NSTextAlignmentCenter;
     tieuDe.font = [UIFont boldSystemFontOfSize:24];
@@ -71,7 +87,7 @@
         tieuDe.textColor = mauRainbow[mauIndex];
     }];
     
-    self.nhanTrangThai = [[UILabel alloc] initWithFrame:CGRectMake(20, 95, chieuRong - 40, 30)];
+    self.nhanTrangThai = [[UILabel alloc] initWithFrame:CGRectMake(20, 150, chieuRong - 40, 30)];
     self.nhanTrangThai.text = @"Trạng thái: SẴN SÀNG";
     self.nhanTrangThai.textAlignment = NSTextAlignmentCenter;
     self.nhanTrangThai.font = [UIFont boldSystemFontOfSize:14];
@@ -81,7 +97,7 @@
     self.nhanTrangThai.clipsToBounds = YES;
     [self.view addSubview:self.nhanTrangThai];
     
-    CGFloat yHienTai = 140;
+    CGFloat yHienTai = 195;
     
     // Hàng ESP
     yHienTai = [self taoHangCongTac:@"ESP ĐỊNH VỊ ĐỊCH" y:yHienTai chieuRong:chieuRong congTac:&_congTacESP action:@selector(batTatESP)];
@@ -95,7 +111,7 @@
     // Hàng Xuyên Tường
     yHienTai = [self taoHangCongTac:@"XUYÊN TƯỜNG" y:yHienTai chieuRong:chieuRong congTac:&_congTacXuyenTuong action:@selector(batTatXuyenTuong)];
     
-    yHienTai += 20;
+    yHienTai += 10;
     
     // Nút mở game
     self.nutMoGame = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -107,7 +123,7 @@
     self.nutMoGame.titleLabel.font = [UIFont boldSystemFontOfSize:18];
     [self.nutMoGame addTarget:self action:@selector(moFreeFire) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:self.nutMoGame];
-    yHienTai += 60;
+    yHienTai += 58;
     
     // Nút thoát game
     self.nutThoatGame = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -119,10 +135,10 @@
     self.nutThoatGame.titleLabel.font = [UIFont boldSystemFontOfSize:14];
     [self.nutThoatGame addTarget:self action:@selector(thoatFreeFire) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:self.nutThoatGame];
-    yHienTai += 50;
+    yHienTai += 48;
     
     // Khung log
-    self.khungLog = [[UITextView alloc] initWithFrame:CGRectMake(20, yHienTai, chieuRong - 40, chieuCao - yHienTai - 20)];
+    self.khungLog = [[UITextView alloc] initWithFrame:CGRectMake(20, yHienTai, chieuRong - 40, chieuCao - yHienTai - 15)];
     self.khungLog.backgroundColor = [UIColor blackColor];
     self.khungLog.textColor = [UIColor greenColor];
     self.khungLog.font = [UIFont fontWithName:@"Menlo" size:10];
@@ -141,23 +157,23 @@
 }
 
 - (CGFloat)taoHangCongTac:(NSString *)tenHang y:(CGFloat)y chieuRong:(CGFloat)chieuRong congTac:(UISwitch **)congTac action:(SEL)action {
-    UIView *hang = [[UIView alloc] initWithFrame:CGRectMake(20, y, chieuRong - 40, 50)];
+    UIView *hang = [[UIView alloc] initWithFrame:CGRectMake(20, y, chieuRong - 40, 45)];
     hang.backgroundColor = [UIColor colorWithWhite:0.12 alpha:0.8];
     hang.layer.cornerRadius = 10;
     [self.view addSubview:hang];
     
-    UILabel *nhan = [[UILabel alloc] initWithFrame:CGRectMake(15, 12, 200, 26)];
+    UILabel *nhan = [[UILabel alloc] initWithFrame:CGRectMake(15, 10, 200, 25)];
     nhan.text = tenHang;
     nhan.textColor = [UIColor whiteColor];
-    nhan.font = [UIFont boldSystemFontOfSize:15];
+    nhan.font = [UIFont boldSystemFontOfSize:14];
     [hang addSubview:nhan];
     
-    UISwitch *ct = [[UISwitch alloc] initWithFrame:CGRectMake(chieuRong - 75, 10, 50, 30)];
+    UISwitch *ct = [[UISwitch alloc] initWithFrame:CGRectMake(chieuRong - 75, 7, 50, 30)];
     [ct addTarget:self action:action forControlEvents:UIControlEventValueChanged];
     [hang addSubview:ct];
     *congTac = ct;
     
-    return y + 60;
+    return y + 52;
 }
 
 - (void)batTatESP {
@@ -223,18 +239,25 @@
 
 - (void)hienTamAo {
     if (self.tamAoView == nil) {
-        self.tamAoView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 20, 20)];
+        self.tamAoView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 24, 24)];
         self.tamAoView.backgroundColor = [UIColor redColor];
-        self.tamAoView.layer.cornerRadius = 10;
+        self.tamAoView.layer.cornerRadius = 12;
         self.tamAoView.layer.borderWidth = 2;
         self.tamAoView.layer.borderColor = [UIColor whiteColor].CGColor;
-        self.tamAoView.alpha = 0.8;
+        self.tamAoView.alpha = 0.7;
+        
+        // Thêm dấu cộng ở giữa
+        UILabel *dauCong = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 24, 24)];
+        dauCong.text = @"+";
+        dauCong.textAlignment = NSTextAlignmentCenter;
+        dauCong.font = [UIFont boldSystemFontOfSize:20];
+        dauCong.textColor = [UIColor whiteColor];
+        [self.tamAoView addSubview:dauCong];
     }
     
-    // Đặt tâm ảo ở giữa màn hình
-    CGFloat tamX = self.view.bounds.size.width / 2 - 10;
-    CGFloat tamY = self.view.bounds.size.height / 2 - 10;
-    self.tamAoView.frame = CGRectMake(tamX, tamY, 20, 20);
+    CGFloat tamX = self.view.bounds.size.width / 2 - 12;
+    CGFloat tamY = self.view.bounds.size.height / 2 - 12;
+    self.tamAoView.frame = CGRectMake(tamX, tamY, 24, 24);
     
     [self.view addSubview:self.tamAoView];
     [self.view bringSubviewToFront:self.tamAoView];
@@ -292,7 +315,6 @@
             if (tenImage != NULL && headerImage != NULL) {
                 NSString *tenImageStr = [NSString stringWithUTF8String:tenImage];
                 
-                // Bỏ qua app của chúng ta
                 if ([tenImageStr containsString:@"FreeFireCheatApp"]) {
                     continue;
                 }
