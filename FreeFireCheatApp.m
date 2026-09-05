@@ -1,11 +1,9 @@
 // ============================================
 // FILE: FreeFireCheatApp.m
 // ============================================
-// APP CHEAT FREE FIRE - ESP + TÂM ẢO MÀU ĐỎ + ICON
+// APP CHEAT FREE FIRE - ESP + TÂM ẢO + ICON
 // BUILD BẰNG CLANG - IPA TRỰC TIẾP
 // COPYRIGHT: HAI LAM
-// CHỨC NĂNG: ESP ĐỊNH VỊ ĐỊCH, TÂM ẢO ĐỎ, AUTO AIM
-// ICON: Tạo icon bằng code khi khởi động
 
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
@@ -35,6 +33,22 @@
 @property (nonatomic, assign) BOOL autoAimDangBat;
 @property (nonatomic, assign) BOOL xuyenTuongDangBat;
 @property (nonatomic, assign) BOOL dangQuet;
+
+- (void)batTatESP;
+- (void)batTatTamAo;
+- (void)batTatAutoAim;
+- (void)batTatXuyenTuong;
+- (void)hienTamAo;
+- (void)anTamAo;
+- (void)batDauTimerESP;
+- (void)dungTimerESP;
+- (void)taoFileCauHinhESP;
+- (void)quetOffsetGame;
+- (void)quetMauByte:(uint64_t)tuDiaChi denDiaChi:(uint64_t)denDiaChi;
+- (void)moFreeFire;
+- (void)thoatFreeFire;
+- (void)capNhatLog:(NSString *)noiDung;
+- (CGFloat)taoHangCongTac:(NSString *)tenHang y:(CGFloat)y chieuRong:(CGFloat)chieuRong congTac:(UISwitch **)congTac action:(SEL)action;
 
 @end
 
@@ -99,21 +113,13 @@
     
     CGFloat yHienTai = 195;
     
-    // Hàng ESP
     yHienTai = [self taoHangCongTac:@"ESP ĐỊNH VỊ ĐỊCH" y:yHienTai chieuRong:chieuRong congTac:&_congTacESP action:@selector(batTatESP)];
-    
-    // Hàng Tâm Ảo
     yHienTai = [self taoHangCongTac:@"TÂM ẢO MÀU ĐỎ" y:yHienTai chieuRong:chieuRong congTac:&_congTacTamAo action:@selector(batTatTamAo)];
-    
-    // Hàng Auto Aim
     yHienTai = [self taoHangCongTac:@"AUTO AIM" y:yHienTai chieuRong:chieuRong congTac:&_congTacAutoAim action:@selector(batTatAutoAim)];
-    
-    // Hàng Xuyên Tường
     yHienTai = [self taoHangCongTac:@"XUYÊN TƯỜNG" y:yHienTai chieuRong:chieuRong congTac:&_congTacXuyenTuong action:@selector(batTatXuyenTuong)];
     
     yHienTai += 10;
     
-    // Nút mở game
     self.nutMoGame = [UIButton buttonWithType:UIButtonTypeSystem];
     self.nutMoGame.frame = CGRectMake(20, yHienTai, chieuRong - 40, 50);
     [self.nutMoGame setTitle:@"🎮 MỞ FREE FIRE" forState:UIControlStateNormal];
@@ -125,9 +131,8 @@
     [self.view addSubview:self.nutMoGame];
     yHienTai += 58;
     
-    // Nút thoát game
     self.nutThoatGame = [UIButton buttonWithType:UIButtonTypeSystem];
-    self.nutThoatGame.frame = CGRectMake(20, yHienTai, chieuRong - 40, 40];
+    self.nutThoatGame.frame = CGRectMake(20, yHienTai, chieuRong - 40, 40);
     [self.nutThoatGame setTitle:@"THOÁT GAME" forState:UIControlStateNormal];
     [self.nutThoatGame setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     self.nutThoatGame.backgroundColor = [UIColor colorWithRed:0.6 green:0.2 blue:0.2 alpha:1.0];
@@ -137,7 +142,6 @@
     [self.view addSubview:self.nutThoatGame];
     yHienTai += 48;
     
-    // Khung log
     self.khungLog = [[UITextView alloc] initWithFrame:CGRectMake(20, yHienTai, chieuRong - 40, chieuCao - yHienTai - 15)];
     self.khungLog.backgroundColor = [UIColor blackColor];
     self.khungLog.textColor = [UIColor greenColor];
@@ -178,7 +182,6 @@
 
 - (void)batTatESP {
     self.espDangBat = self.congTacESP.isOn;
-    
     if (self.espDangBat) {
         self.nhanTrangThai.text = @"ESP: ĐANG BẬT";
         self.nhanTrangThai.textColor = [UIColor greenColor];
@@ -195,11 +198,10 @@
 
 - (void)batTatTamAo {
     self.tamAoDangBat = self.congTacTamAo.isOn;
-    
     if (self.tamAoDangBat) {
         self.nhanTrangThai.text = @"TÂM ẢO: ĐANG BẬT";
         self.nhanTrangThai.textColor = [UIColor redColor];
-        [self capNhatLog:@"Tâm ảo đã bật. Màu đỏ sẽ hiển thị giữa màn hình."];
+        [self capNhatLog:@"Tâm ảo đã bật"];
         [self hienTamAo];
     } else {
         self.nhanTrangThai.text = @"TÂM ẢO: ĐÃ TẮT";
@@ -211,7 +213,6 @@
 
 - (void)batTatAutoAim {
     self.autoAimDangBat = self.congTacAutoAim.isOn;
-    
     if (self.autoAimDangBat) {
         self.nhanTrangThai.text = @"AUTO AIM: ĐANG BẬT";
         self.nhanTrangThai.textColor = [UIColor greenColor];
@@ -225,7 +226,6 @@
 
 - (void)batTatXuyenTuong {
     self.xuyenTuongDangBat = self.congTacXuyenTuong.isOn;
-    
     if (self.xuyenTuongDangBat) {
         self.nhanTrangThai.text = @"XUYÊN TƯỜNG: ĐANG BẬT";
         self.nhanTrangThai.textColor = [UIColor greenColor];
@@ -246,7 +246,6 @@
         self.tamAoView.layer.borderColor = [UIColor whiteColor].CGColor;
         self.tamAoView.alpha = 0.7;
         
-        // Thêm dấu cộng ở giữa
         UILabel *dauCong = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 24, 24)];
         dauCong.text = @"+";
         dauCong.textAlignment = NSTextAlignmentCenter;
@@ -274,7 +273,6 @@
     if (self.timerESP) {
         [self.timerESP invalidate];
     }
-    
     self.timerESP = [NSTimer scheduledTimerWithTimeInterval:3.0 repeats:YES block:^(NSTimer *timer) {
         if (self.espDangBat) {
             [self quetOffsetGame];
@@ -292,7 +290,6 @@
 - (void)taoFileCauHinhESP {
     NSString *duongDanDocuments = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
     NSString *duongDanFile = [duongDanDocuments stringByAppendingPathComponent:@"esp_config.txt"];
-    
     NSString *noiDung = [NSString stringWithFormat:@"esp=%d\ntam_ao=%d\nauto_aim=%d\nxuyen_tuong=%d\n", 
                         self.espDangBat, self.tamAoDangBat, self.autoAimDangBat, self.xuyenTuongDangBat];
     [noiDung writeToFile:duongDanFile atomically:YES encoding:NSUTF8StringEncoding error:nil];
@@ -304,7 +301,6 @@
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         [self.duLieuOffset setString:@""];
-        
         uint32_t soLuongImage = _dyld_image_count();
         
         for (uint32_t i = 0; i < soLuongImage; i++) {
@@ -315,9 +311,7 @@
             if (tenImage != NULL && headerImage != NULL) {
                 NSString *tenImageStr = [NSString stringWithUTF8String:tenImage];
                 
-                if ([tenImageStr containsString:@"FreeFireCheatApp"]) {
-                    continue;
-                }
+                if ([tenImageStr containsString:@"FreeFireCheatApp"]) continue;
                 
                 if ([tenImageStr containsString:@"libil2cpp"] ||
                     [tenImageStr containsString:@"GameAssembly"] ||
@@ -333,9 +327,7 @@
                     if (batDauText != NULL && kichThuocText > 0) {
                         uint64_t diaChiBatDau = (uint64_t)batDauText + truotImage;
                         uint64_t diaChiKetThuc = diaChiBatDau + kichThuocText;
-                        
                         [self capNhatLog:[NSString stringWithFormat:@"Quét: %@", [tenImageStr lastPathComponent]]];
-                        
                         [self quetMauByte:diaChiBatDau denDiaChi:diaChiKetThuc];
                     }
                 }
@@ -372,7 +364,6 @@
             memcpy(duLieu, (void *)viTri, 4);
             
             BOOL timThay = NO;
-            
             if (duLieu[0] == mauByte1[0] && duLieu[1] == mauByte1[1] && duLieu[2] == mauByte1[2] && duLieu[3] == mauByte1[3]) timThay = YES;
             if (duLieu[0] == mauByte2[0] && duLieu[1] == mauByte2[1] && duLieu[2] == mauByte2[2] && duLieu[3] == mauByte2[3]) timThay = YES;
             if (duLieu[0] == mauByte3[0] && duLieu[1] == mauByte3[1] && duLieu[2] == mauByte3[2] && duLieu[3] == mauByte3[3]) timThay = YES;
@@ -399,7 +390,6 @@
 
 - (void)moFreeFire {
     [self taoFileCauHinhESP];
-    
     self.nhanTrangThai.text = @"Đang mở Free Fire...";
     self.nhanTrangThai.textColor = [UIColor orangeColor];
     
@@ -407,12 +397,9 @@
     NSURL *url = [NSURL URLWithString:urlStr];
     
     if ([[UIApplication sharedApplication] canOpenURL:url]) {
-        [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:^(BOOL thanhCong) {
-            if (thanhCong) {
-                self.nhanTrangThai.text = @"Đã mở Free Fire";
-                self.nhanTrangThai.textColor = [UIColor greenColor];
-            }
-        }];
+        [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+        self.nhanTrangThai.text = @"Đã mở Free Fire";
+        self.nhanTrangThai.textColor = [UIColor greenColor];
     } else {
         self.nhanTrangThai.text = @"Không tìm thấy Free Fire";
         self.nhanTrangThai.textColor = [UIColor redColor];
@@ -452,11 +439,9 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     self.window.backgroundColor = [UIColor blackColor];
-    
     CheatViewController *rootVC = [[CheatViewController alloc] init];
     self.window.rootViewController = rootVC;
     [self.window makeKeyAndVisible];
-    
     return YES;
 }
 
